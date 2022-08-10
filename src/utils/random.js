@@ -1,29 +1,33 @@
-const createObj = (cantidad) => {
-    let numbers = [];
-    let numObj = {};
+process.on("message", message => {
+    const jsonResponse = createNums(message.number);
+    process.send(jsonResponse);
+    process.exit();
+})
 
-    for (let i = 0; i < cantidad; i++) {
-        let number = Math.floor(Math.random() * 1000) + 1;
-        numbers.push(number);
+let numeros = [];
+
+function createObj(number) {
+    let numObj = {};
+    
+    for (let i = 0; i < number; i++) {
+        let num = Math.floor(Math.random() * 1000) + 1;
+        numeros.push(num);
     };
 
-    for (let num of numbers) {
-        if (numObj[num]) {
-            return numObj[num] += 1
+    for (let n of numeros) {
+        if (numObj[n]) {
+            numObj[n] += 1
         } else {
-            return numObj[num] = 1
+            numObj[n] = 1
         };
-    }; 
+    };
+    return numObj
 };
 
 const createNums = (cant) => {
     if (Number(cant) > 0) {
-        createObj(cant);
+        return createObj(cant);
     } else {
-        createObj(100000000);
+        return createObj(100000000);
     };  
 }
-
-process.on('finish', () => {
-    process.send(createNums(Number(process.argv[2])));
-});
