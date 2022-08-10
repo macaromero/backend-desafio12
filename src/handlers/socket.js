@@ -19,7 +19,7 @@ const socketConfig = async (socket, sockets) => {
     socket.emit('mensajes');
     socket.emit('tablaProductos', getProducts);
     socket.emit('chat', getMessages);
-    socket.emit('log', getNombre(nombre));
+    socket.emit('log', nombre);
 
     socket.on('addProduct', async product => {
         await claseProductos.save(product);

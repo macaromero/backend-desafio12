@@ -1,6 +1,6 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
-const PORT = 8080;
 const path = require('path');
 const http = require('http');
 const server = http.createServer(app);
@@ -12,11 +12,9 @@ const {socketConfig} = require('./src/handlers/socket');
 const router = require('./src/routes/main');
 const logIn = require('./src/routes/logIn');
 const register = require('./src/routes/register');
+const info = require('./src/routes/info');
+const random = require('./src/routes/random')
 const { mongoConnection } = require('./src/config/mongodb');
-
-io.on('connection', async socket => {
-    socketConfig(socket, io.sockets);
-});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -24,9 +22,9 @@ app.use(express.static(path.join(__dirname, '/public')));
 
 
 app.use(session({
-    secret: "clavesecreta",
-    resave: true,
-    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET,
+    resave: process.env.SESSION_RESAVE,
+    saveUninitialized: process.env.SESSION_SAVEUNINITIALIZED,
     cookie: {
         maxAge:60000
     }
@@ -35,12 +33,18 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+io.on('connection', async socket => {
+    socketConfig(socket, io.sockets);
+});
+
 app.use('/log', logIn);
 app.use('/register', register);
+app.use('/info', info);
+app.use('/api/randoms', random)
 app.use('/', router);
 
 
-server.listen(PORT, async () => {
+server.listen(process.env.PORT || 8080, async () => {
+    console.log(`Server running on port ${process.env.PORT || 8080}`);
     await mongoConnection();
-    console.log(`Server running on port ${PORT}`);
 });
